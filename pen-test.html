@@ -1,0 +1,23 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>pen test</title>
+<style>body{font-family:-apple-system,sans-serif;margin:16px;background:#fff7fa;color:#4a2b35}h1{font-size:20px}label{display:block;margin:14px 0 4px;font-size:15px}
+input,textarea{width:100%;box-sizing:border-box;font-size:24px;padding:14px;border:2px solid #f1b2c3;border-radius:12px;background:#fff}
+pre{background:#222;color:#9f9;padding:10px;border-radius:10px;font-size:13px;height:260px;overflow:auto;white-space:pre-wrap}</style></head><body>
+<h1>&#xC560;&#xD50C;&#xD39C;&#xC2AC; &#xC785;&#xB825; &#xD14C;&#xC2A4;&#xD2B8;</h1>
+<p>&#xAC01; &#xCE78;&#xC5D0; &#xD39C;&#xC2AC;&#xB85C; &#xAE00;&#xC790;&#xB97C; &#xC368; &#xBCF4;&#xC138;&#xC694;. &#xC544;&#xB798; &#xAC80;&#xC740; &#xCC3D;&#xC5D0; &#xBB34;&#xC2A8; &#xC77C;&#xC774; &#xC77C;&#xC5B4;&#xB098;&#xB294;&#xC9C0; &#xAE30;&#xB85D;&#xB429;&#xB2C8;&#xB2E4;.</p>
+<label>A. text</label><input id="a" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+<label>B. text + inputmode=email</label><input id="b" type="text" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+<label>C. text + inputmode=none</label><input id="c" type="text" inputmode="none" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+<label>D. textarea</label><textarea id="d" rows="2"></textarea>
+<pre id="log"></pre>
+<script>
+var L=document.getElementById('log'),n=0;
+function w(s){n++;L.textContent=n+' '+s+'\n'+L.textContent.split('\n').slice(0,40).join('\n')}
+w('standalone='+(navigator.standalone===true)+' touch='+navigator.maxTouchPoints);
+['a','b','c','d'].forEach(function(id){var e=document.getElementById(id);
+e.addEventListener('pointerdown',function(x){w(id+' pointerdown '+x.pointerType)});
+e.addEventListener('focus',function(){w(id+' focus')});
+e.addEventListener('beforeinput',function(x){w(id+' beforeinput '+x.inputType+' ['+(x.data||'')+']')});
+e.addEventListener('input',function(){w(id+' input value=['+e.value+']')});
+e.addEventListener('paste',function(){w(id+' paste event')});
+});
+</script></body></html>
