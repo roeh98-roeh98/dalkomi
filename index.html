@@ -1679,13 +1679,15 @@ const lrn=d=>Object.keys((S.lr&&S.lr[d])||{}).length;
 function lrMark(d,i){S.lr=S.lr||{};(S.lr[d]=S.lr[d]||{})[i]=1}
 function lrFill(){let c=0;const has=(d,i)=>S.lr&&S.lr[d]&&S.lr[d][i];if(S.rep)for(const k in S.rep){const r=S.rep[k],x=W[k];if(x&&r&&r.n>=REP){const i=dw(x.d).indexOf(x);if(i>=0&&!has(x.d,i)){lrMark(x.d,i);c=1}}}if(S.seen&&S.seen.w&&S.seen.d)for(const i in S.seen.w)if(!has(S.seen.d,i)){lrMark(S.seen.d,i);c=1}if(c)save()}
 const scT=u=>S.bs&&S.bs[u]!=null?S.bs[u]+'\uC810':(S.best[u]?S.best[u]+'\uB4F1\uAE09':'-');
+function lev(a,b){const m=a.length,n=b.length,t=[];for(let i=0;i<=m;i++)t[i]=[i];for(let j=1;j<=n;j++)t[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)t[i][j]=Math.min(t[i-1][j]+1,t[i][j-1]+1,t[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return t[m][n]}
+function simw(x,d){const c=dw(d).filter(y=>y!=x&&y.w!=x.w).map(y=>{let p=0;while(p<x.w.length&&x.w[p]==y.w[p])p++;return{w:y.w,s:lev(x.w,y.w)-p*.25+Math.random()*.6}}).sort((a,b)=>a.s-b.s).slice(0,3).map(y=>y.w);return c.length<3?c.concat(mis(x.w,3-c.length)):c}
 function mis(w,n){const V='aeiou',a=w.split(''),L=c=>/[a-z]/.test(c),ops=[];
 for(let j=0;j<a.length-1;j++)if(a[j]!=a[j+1]&&L(a[j])&&L(a[j+1]))ops.push(()=>{const b=a.slice();[b[j],b[j+1]]=[b[j+1],b[j]];return b.join('')});
 for(let j=0;j<a.length;j++){if(V.includes(a[j]))[...V].filter(v=>v!=a[j]).forEach(v=>ops.push(()=>{const b=a.slice();b[j]=v;return b.join('')}));
 if(L(a[j])){if(a[j]==a[j+1]||V.includes(a[j]))ops.push(()=>a.slice(0,j).concat(a.slice(j+1)).join(''));if(a[j]!=a[j+1])ops.push(()=>a.slice(0,j+1).concat(a.slice(j)).join(''))}}
 const out=new Set();for(const f of sh(ops)){const r=f();if(r&&r!=w&&r.length>1)out.add(r);if(out.size>=n)break}return [...out]}
 document.addEventListener('keydown',e=>{if(scr!='exam'||e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.tagName=='INPUT'||t.tagName=='TEXTAREA'))return;
-const nx=document.querySelector('.ov .bn button');if(nx){if(e.key=='Enter'||e.key==' '||e.key=='ArrowRight'){e.preventDefault();nx.click()}return}
+if(document.querySelector('.ov')){if(!e.repeat&&(e.key=='Enter'||e.key==' '||e.key=='ArrowRight')){e.preventDefault();go()}return}
 if(st.lock)return;const bs=[...app.querySelectorAll('button.o')];if(!bs.length)return;let h=st.hi==null?-1:st.hi;const k=e.key;
 if(/^[1-9]$/.test(k)){if(+k>bs.length)return;e.preventDefault();st.hi=+k-1;bs[+k-1].click();return}
 if(k=='ArrowDown'||k=='ArrowRight')h=(h+1)%bs.length;else if(k=='ArrowUp'||k=='ArrowLeft')h=(h<=0?bs.length:h)-1;
@@ -1715,7 +1717,7 @@ let st={};
 function exam(d){view('exam');if(mode(d)=='locked'){home();return}start(d);const q0=sh(dw(d)).slice(0,10);st={d,q:q0,ty:sh(q0.map((_,j)=>j<Math.round(q0.length*.4)?'w':j<Math.round(q0.length*.4)+Math.round(q0.length*.3)?'m':'t')),i:0,ok:0,bad:[],hi:-1};ask()}
 function ask(){const{q,i,d}=st;if(i>=q.length)return done();const x=q[i];let h=`<div style="display:flex;justify-content:space-between;align-items:center"><p class="mu">\uC2DC\uD5D8 ${i+1}/${q.length}</p>${cat('idle',64)}</div>`;
 if(st.ty[i]=='w'){const o=sh([x,...sh(dw(d).filter(y=>y!=x&&y.m!=x.m)).slice(0,3)]);st.hi=-1;h+=`<div class="c big"><h2>${x.w}</h2><p class="mu">\uC54C\uB9DE\uC740 \uB73B\uC744 \uACE0\uB974\uC138\uC694</p><p class="mu" style="font-size:13px">\u2328\uFE0F \uD0A4\uBCF4\uB4DC: \u2191\u2193 \uD0A4\uB85C \uACE0\uB974\uACE0 Enter (\uC22B\uC790 \uD0A4 1~4\uB3C4 \uB3FC\uC694)</p></div>`+o.map((y,j)=>`<button class="o" data-c="${y==x?1:0}" onclick="ans(${y==x},this)">${j+1}. ${y.m}</button>`).join('')}
-else if(st.ty[i]=='m'){const o=sh([x.w,...mis(x.w,3)]);st.hi=-1;h+=`<div class="c big"><p style="font-size:22px">${x.m}</p><p class="mu">\uC54C\uB9DE\uC740 \uC601\uC5B4 \uCCA0\uC790\uB97C \uACE0\uB974\uC138\uC694</p><p class="mu" style="font-size:13px">\u2328\uFE0F \uD0A4\uBCF4\uB4DC: \u2191\u2193 \uD0A4\uB85C \uACE0\uB974\uACE0 Enter (\uC22B\uC790 \uD0A4 1~4\uB3C4 \uB3FC\uC694)</p></div>`+o.map((y,j)=>`<button class="o" data-c="${y==x.w?1:0}" onclick="ans(${y==x.w},this)">${j+1}. ${y}</button>`).join('')}
+else if(st.ty[i]=='m'){const o=sh([x.w,...simw(x,d)]);st.hi=-1;h+=`<div class="c big"><p style="font-size:22px">${x.m}</p><p class="mu">\uC54C\uB9DE\uC740 \uC601\uC5B4 \uCCA0\uC790\uB97C \uACE0\uB974\uC138\uC694</p><p class="mu" style="font-size:13px">\u2328\uFE0F \uD0A4\uBCF4\uB4DC: \u2191\u2193 \uD0A4\uB85C \uACE0\uB974\uACE0 Enter (\uC22B\uC790 \uD0A4 1~4\uB3C4 \uB3FC\uC694)</p></div>`+o.map((y,j)=>`<button class="o" data-c="${y==x.w?1:0}" onclick="ans(${y==x.w},this)">${j+1}. ${y}</button>`).join('')}
 else h+=`<div class="c big"><p style="font-size:22px">${x.m}</p><p class="mu">\uC601\uC5B4\uB85C \uC4F0\uC138\uC694</p></div><input id="t" lang="en" type="text" inputmode="${HM==2?'none':'email'}" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="\uC601\uC5B4\uB85C \uC4F0\uAE30 (\uD39C \uC785\uB825 \uAC00\uB2A5)"><button class="p" style="width:100%" onclick="ans($('#t').value.trim().toLowerCase()=='${x.w}')">\uD655\uC778</button>`;
 app.innerHTML=h;const ti=$('#t');if(ti){ti.focus();ti.addEventListener('keydown',e=>{if(e.key==='Enter')app.querySelector('button.p').click();else hwKey(e,'en')})}}
 function tone(ok){try{const c=new(window.AudioContext||window.webkitAudioContext)(),t=c.currentTime;(ok?[660,880]:[220,165]).forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.type=ok?'sine':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.15,t+i*.15);g.gain.exponentialRampToValueAtTime(.001,t+i*.15+.14);o.connect(g);g.connect(c.destination);o.start(t+i*.15);o.stop(t+i*.15+.15)});if(navigator.vibrate)navigator.vibrate(ok?30:[80,60,80])}catch(e){}}
@@ -1725,8 +1727,8 @@ const c=app.querySelector('[data-c="1"]');if(c)c.style.cssText='background:rgba(
 if(el&&!ok)el.style.cssText='background:rgba(255,138,150,.5);border-color:#ff8a96';
 if(document.activeElement)document.activeElement.blur();
 const o=document.createElement('div');o.className='ov '+(ok?'good':'bad');o.innerHTML=ok?'<span>\u2B55 \uC815\uB2F5!</span>':`<div class="bn"><b>\u274C \uC815\uB2F5: ${st.ty[st.i]=='w'?x.w+' = '+x.m:x.w}</b><button onclick="go()">\uB2E4\uC74C \u25B6</button></div>`;document.body.appendChild(o);
-st.i++;if(ok)setTimeout(go,900)}
-function go(){const o=document.querySelector('.ov');if(o)o.remove();st.lock=0;ask()}
+st.i++;if(ok)st.tm=setTimeout(go,900)}
+function go(){clearTimeout(st.tm);const o=document.querySelector('.ov');if(o)o.remove();st.lock=0;ask()}
 function done(){view('done');const s=st.ok*10,g=G(s),d=st.d,t=TD();ro();const md=mode(d);let add=0,msg='';
 if(md=='review')msg='\uBCF5\uC2B5\uC740 \uC6A9\uB3C8\uC774 \uC5C6\uC5B4\uC694 \u{1F501}';
 else{const pd=S.paid[d]&&S.paid[d].t==t?S.paid[d].a:0,want=Math.max(0,P[g]-pd);add=earn(want);S.paid[d]={t:t,a:pd+add};
